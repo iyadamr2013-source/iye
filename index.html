@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>رسم بالبكسل - Pixel Art</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            background: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            direction: rtl;
+        }
+        .container {
+            background: #16213e;
+            padding: 25px 30px 30px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #e0e0e0;
+            font-weight: 400;
+            letter-spacing: 2px;
+            margin-top: 0;
+            margin-bottom: 18px;
+            font-size: 26px;
+            border-bottom: 2px solid #0f3460;
+            padding-bottom: 10px;
+            width: 100%;
+            text-align: center;
+        }
+        .canvas-wrapper {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 24px;
+            box-shadow: inset 0 0 12px #0a0a1a;
+            display: inline-block;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            cursor: crosshair;
+            width: 500px;
+            height: 500px;
+            image-rendering: pixelated; /* للحفاظ على وضوح البكسل */
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            margin-top: 25px;
+            background: #1a1a3e;
+            padding: 18px 25px;
+            border-radius: 60px;
+            box-shadow: inset 0 2px 8px #0a0a1a;
+        }
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #0f3460;
+            padding: 5px 18px 5px 12px;
+            border-radius: 40px;
+        }
+        .color-picker-wrapper label {
+            color: #ccc;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        input[type="color"] {
+            width: 44px;
+            height: 44px;
+            border: 2px solid #aaa;
+            border-radius: 50%;
+            padding: 2px;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: #0f3460;
+            border: none;
+            color: #eee;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 0 #0a1a2e;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn:hover {
+            background: #1a4a7a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #0a1a2e;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #0a1a2e;
+        }
+        .btn-danger {
+            background: #a13d3d;
+            box-shadow: 0 4px 0 #5e1f1f;
+        }
+        .btn-danger:hover {
+            background: #c94f4f;
+        }
+        .btn-success {
+            background: #2a7a4a;
+            box-shadow: 0 4px 0 #144d2e;
+        }
+        .btn-success:hover {
+            background: #3a9a5e;
+        }
+        .size-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #0f3460;
+            padding: 4px 16px 4px 12px;
+            border-radius: 40px;
+        }
+        .size-control label {
+            color: #ccc;
+            font-size: 15px;
+        }
+        .size-control input {
+            width: 60px;
+            padding: 6px 4px;
+            border-radius: 30px;
+            border: none;
+            text-align: center;
+            font-weight: bold;
+            background: #e8e8e8;
+            color: #111;
+        }
+        .size-control input:focus {
+            outline: 2px solid #6ab0ff;
+        }
+        .info {
+            color: #b0b0d0;
+            font-size: 14px;
+            margin-top: 16px;
+            background: #0f1f3a;
+            padding: 8px 28px;
+            border-radius: 40px;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            canvas {
+                width: 90vw;
+                height: 90vw;
+                max-width: 500px;
+                max-height: 500px;
+            }
+            .controls {
+                gap: 12px;
+                padding: 16px 14px;
+                border-radius: 30px;
+                flex-direction: column;
+            }
+            .btn-group {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 رسم بالبكسل</h1>
+        <div class="canvas-wrapper">
+            <canvas id="pixelCanvas" width="400" height="400"></canvas>
+        </div>
+
+        <div class="controls">
+            <div class="color-picker-wrapper">
+                <label for="colorPicker">🖌️ اللون</label>
+                <input type="color" id="colorPicker" value="#e74c3c" />
+            </div>
+
+            <div class="size-control">
+                <label for="gridSize">📏 حجم الشبكة</label>
+                <input type="number" id="gridSize" min="4" max="100" value="20" step="1" />
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-success" id="clearBtn">🧹 مسح الكل</button>
+                <button class="btn btn-danger" id="resetBtn">🔄 إعادة تعيين</button>
+            </div>
+        </div>
+
+        <div class="info">
+            ⬅️ اضغط واسحب للرسم | الزر الأيمن للعكس | 🔄 تغيير الحجم يعيد ضبط اللوحة
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // === العناصر ===
+            const canvas = document.getElementById('pixelCanvas');
+            const ctx = canvas.getContext('2d');
+            const colorPicker = document.getElementById('colorPicker');
+            const gridSizeInput = document.getElementById('gridSize');
+            const clearBtn = document.getElementById('clearBtn');
+            const resetBtn = document.getElementById('resetBtn');
+
+            // === الحالة ===
+            let gridSize = 20;           // عدد الخلايا في كل صف/عمود
+            let cells = [];              // مصفوفة ثنائية الأبعاد لتخزين الألوان (سلسلة hex)
+            let isDrawing = false;
+            let isErasing = false;       // عند الضغط بزر الفأرة الأيمن
+            let currentColor = '#e74c3c';
+
+            // === دوال الرسم ===
+            function drawGrid() {
+                const width = canvas.width;
+                const height = canvas.height;
+                const cellSize = width / gridSize;
+
+                // مسح الخلفية
+                ctx.clearRect(0, 0, width, height);
+
+                // رسم كل خلية
+                for (let row = 0; row < gridSize; row++) {
+                    for (let col = 0; col < gridSize; col++) {
+                        const color = cells[row][col];
+                        ctx.fillStyle = color;
+                        ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                    }
+                }
+
+                // رسم شبكة الخطوط (رمادية فاتحة)
+                ctx.strokeStyle = '#d0d0d0';
+                ctx.lineWidth = 0.8;
+                for (let i = 0; i <= gridSize; i++) {
+                    const pos = i * cellSize;
+                    ctx.beginPath();
+                    ctx.moveTo(pos, 0);
+                    ctx.lineTo(pos, height);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(0, pos);
+                    ctx.lineTo(width, pos);
+                    ctx.stroke();
+                }
+            }
+
+            // إعادة تهيئة المصفوفة بلون أبيض
+            function initCells(color = '#ffffff') {
+                cells = [];
+                for (let r = 0; r < gridSize; r++) {
+                    const row = [];
+                    for (let c = 0; c < gridSize; c++) {
+                        row.push(color);
+                    }
+                    cells.push(row);
+                }
+            }
+
+            // تحديث الحجم وإعادة الضبط
+            function resizeGrid(newSize) {
+                // تحديد القيمة الفعلية
+                let size = parseInt(newSize, 10);
+                if (isNaN(size) || size < 4) size = 4;
+                if (size > 100) size = 100;
+                gridSizeInput.value = size;
+                gridSize = size;
+                // إعادة تعيين الخلايا إلى الأبيض
+                initCells('#ffffff');
+                drawGrid();
+            }
+
+            // تعيين لون خلية معينة (مع حدود)
+            function setCellColor(row, col, color) {
+                if (row >= 0 && row < gridSize && col >= 0 && col < gridSize) {
+                    cells[row][col] = color;
+                }
+            }
+
+            // الحصول على إحداثيات الخلية من حدث الفأرة (نسبة إلى canvas)
+            function getCellFromEvent(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;   // canvas width / CSS width
+                const scaleY = canvas.height / rect.height;
+
+                // إحداثيات الفأرة داخل canvas (بكسل حقيقي)
+                const mouseX = (e.clientX - rect.left) * scaleX;
+                const mouseY = (e.clientY - rect.top) * scaleY;
+
+                if (mouseX < 0 || mouseX >= canvas.width || mouseY < 0 || mouseY >= canvas.height) {
+                    return null;
+                }
+
+                const cellSize = canvas.width / gridSize;
+                const col = Math.floor(mouseX / cellSize);
+                const row = Math.floor(mouseY / cellSize);
+                return { row, col };
+            }
+
+            // رسم نقطة (فردية) بناءً على الحدث والوضع (رسم أو مسح)
+            function paintFromEvent(e) {
+                const coord = getCellFromEvent(e);
+                if (!coord) return;
+                const { row, col } = coord;
+
+                let color;
+                if (isErasing) {
+                    // المسح: نضع أبيض
+                    color = '#ffffff';
+                } else {
+                    color = currentColor;
+                }
+                setCellColor(row, col, color);
+                drawGrid();
+            }
+
+            // === أحداث الفأرة ===
+            function onMouseDown(e) {
+                e.preventDefault();
+                const button = e.button; // 0 = يسار, 2 = يمين
+                isDrawing = true;
+                isErasing = (button === 2);
+
+                // في حالة الزر الأيمن نمنع القائمة السياقية
+                if (button === 2) {
+                    canvas.style.cursor = 'not-allowed';
+                } else {
+                    canvas.style.cursor = 'crosshair';
+                }
+
+                paintFromEvent(e);
+            }
+
+            function onMouseMove(e) {
+                e.preventDefault();
+                if (!isDrawing) return;
+                paintFromEvent(e);
+            }
+
+            function onMouseUp(e) {
+                e.preventDefault();
+                if (isDrawing) {
+                    isDrawing = false;
+                    isErasing = false;
+                    canvas.style.cursor = 'crosshair';
+                }
+            }
+
+            function onMouseLeave(e) {
+                // إذا غادر الماوس اللوحة أثناء الرسم، نوقف الرسم
+                if (isDrawing) {
+                    isDrawing = false;
+                    isErasing = false;
+                    canvas.style.cursor = 'crosshair';
+                }
+            }
+
+            // منع القائمة السياقية على canvas
+            function onContextMenu(e) {
+                e.preventDefault();
+                return false;
+            }
+
+            // === إعداد الأحداث ===
+            function attachCanvasEvents() {
+                canvas.addEventListener('mousedown', onMouseDown);
+                canvas.addEventListener('mousemove', onMouseMove);
+                canvas.addEventListener('mouseup', onMouseUp);
+                canvas.addEventListener('mouseleave', onMouseLeave);
+                canvas.addEventListener('contextmenu', onContextMenu);
+            }
+
+            // === إزالة الأحداث (للتنظيف) ===
+            function detachCanvasEvents() {
+                canvas.removeEventListener('mousedown', onMouseDown);
+                canvas.removeEventListener('mousemove', onMouseMove);
+                canvas.removeEventListener('mouseup', onMouseUp);
+                canvas.removeEventListener('mouseleave', onMouseLeave);
+                canvas.removeEventListener('contextmenu', onContextMenu);
+            }
+
+            // === إعادة ربط الأحداث بعد تغيير الحجم أو أي إعادة تهيئة ===
+            function reattachEvents() {
+                detachCanvasEvents();
+                attachCanvasEvents();
+            }
+
+            // === معالجة تغيير اللون ===
+            colorPicker.addEventListener('input', function(e) {
+                currentColor = e.target.value;
+            });
+
+            // === زر المسح (مسح الكل إلى الأبيض) ===
+            clearBtn.addEventListener('click', function() {
+                initCells('#ffffff');
+                drawGrid();
+            });
+
+            // === زر إعادة التعيين (إلى الحجم الحالي مع خلفية بيضاء) ===
+            resetBtn.addEventListener('click', function() {
+                resizeGrid(gridSize);
+                // نعيد ربط الأحداث (للتأكد)
+                reattachEvents();
+            });
+
+            // === تغيير حجم الشبكة ===
+            gridSizeInput.addEventListener('change', function(e) {
+                const val = parseInt(e.target.value, 10);
+                if (!isNaN(val) && val >= 4 && val <= 100) {
+                    resizeGrid(val);
+                    reattachEvents();
+                } else {
+                    // إعادة تعيين القيمة إلى الحجم الحالي إذا كانت خارج النطاق
+                    gridSizeInput.value = gridSize;
+                }
+            });
+
+            // === بدء التشغيل ===
+            function init() {
+                // تعيين الحجم الأولي
+                gridSize = 20;
+                gridSizeInput.value = gridSize;
+                initCells('#ffffff');
+                drawGrid();
+                attachCanvasEvents();
+                // تعيين اللون الحالي من المنتقي
+                currentColor = colorPicker.value;
+            }
+
+            init();
+
+            // في حال تغيير الحجم عبر الزر نضمن إعادة الربط
+            // لكن resizeGrid يستخدم داخل resetBtn و change
+            // ولضمان الربط بعد resizeGrid نضيف استدعاء reattachEvents في الأماكن المناسبة.
+            // تم بالفعل إضافة reattachEvents في resetBtn و change.
+
+            // (اختياري) دعم تغيير الحجم من لوحة المفاتيح
+            window.addEventListener('resize', function() {
+                // لا نفعل شيئاً، لأن canvas يعتمد على الحجم الثابت
+            });
+
+            console.log('✅ Pixel Art ready! استمتع بالرسم.');
+        })();
+    </script>
+</body>
+</html>
